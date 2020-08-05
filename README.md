@@ -437,8 +437,305 @@ foreach($voicemails as $voicemail){
     <br><br><br>
     <?
 ```
+# Get Packages Information
+```
+$method = "getPackages";
 
+/* Get Errors - Invalid_Package */
+if($response[status]!='success'){
+    echo $response[status];
+    exit;
+}
 
+/* Get Packages Array */
+$packages = $response[packages];
+
+/* Display Packages */
+foreach($packages as $package){
+    ?>
+    <table style="border: 1px solid #336699; width:500px">
+        <tr>
+            <td>Package:</td>
+            <td>
+                <? echo $package[package] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Name:</td>
+            <td>
+                <? echo $package[name] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Mark Up Fixed:</td>
+            <td>
+                <? echo $package[markup_fixed] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Mark Up Percentage:</td>
+            <td>
+                <? echo $package[markup_percentage] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Pulse:</td>
+            <td>
+                <? echo $package[pulse] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>International Route:</td>
+            <td>
+                <? echo $package[international_route] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Montly Fee:</td>
+            <td>
+                <? echo $package[monthly_fee] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Setup Fee:</td>
+            <td>
+                <? echo $package[setup_fee] ?>
+            </td>
+        <tr>
+        
+        <tr>
+            <td>Free Minutes:</td>
+            <td>
+                <? echo $package[free_minutes] ?>
+            </td>
+        <tr>
+       
+    </table>
+    <br><br><br>
+    <?
+```
+
+# Get Call Detail Records
+
+```
+$method = "getCDR";
+
+/* Get Errors - no_cdr */
+if($response[status]!='success'){
+    echo $response[status];
+    exit;
+}
+
+/* Get CDR Array */
+$cdr = $response[cdr];
+
+/* Calls */
+$calls = count($cdr);
+
+/* Duration / Total */
+foreach($cdr as $call){
+    $duration += $call[seconds];
+    $total += $call[total];
+}
+$duration = secToTime($duration);
+
+?>
+<table cellspacing="0" cellpadding="6" style="border: 1px solid #336699">
+    <tr style="border: 1px solid #336699">
+        <td style="border: 1px solid #336699">
+            Date
+        </td>
+        <td style="border: 1px solid #336699">
+            CallerID
+        </td>
+        <td style="border: 1px solid #336699">
+            Destination
+        </td>
+        <td style="border: 1px solid #336699">
+            Description
+        </td>
+        <td style="border: 1px solid #336699">
+            Duration
+        </td>
+        <td style="border: 1px solid #336699">
+            Rate
+        </td>
+        <td style="border: 1px solid #336699">
+            Total
+        </td>
+    
+    </tr>
+    <?
+    foreach($cdr as $call){
+        ?>
+        <tr>
+            <td>
+                <? echo $call[date]; ?>
+            </td>
+            <td>
+                <? echo $call[callerid]; ?>
+            </td>
+            <td>
+                <? echo $call[destination]; ?>
+            </td>
+            <td>
+                <? echo $call[description]; ?>
+            </td>
+            <td align="right">
+                <? echo $call[duration]; ?>
+            </td>
+            <td align="right">
+                <? echo $call[rate]; ?>
+            </td>
+            <td align="right">
+                <? echo $call[total]; ?>
+            </td>
+        </tr>
+        <?
+    }
+    ?>
+    <tr>
+        <td colspan="7" align="right">
+            <? echo "Calls: {$calls} | Duration: {$duration} | Total: \${$total}"; ?>
+        </td>
+    </tr>
+</table>
+
+<?
+
+/* Function to Calculate Time */
+function secToTime($secs){
+    if(!$secs){return 0;}
+    
+    $vals = array('h' => floor($secs / 3600), 
+                  'm' => floor($secs % 3600 / 60), 
+                  's' => $secs % 60); 
+
+    $ret = array(); 
+
+    $added = false; 
+    foreach ($vals as $k => $v) { 
+        if ($v > 0 || $added) { 
+            $ret[] = ((strlen($v) == 1) && $added) ? "0$v" : $v; 
+            $added = true;
+        } 
+    } 
+
+    return join(':', $ret); 
+}
+```
+
+# Get Reseller Customer CDR
+
+```
+$method = "getResellerCDR";
+$client = 500000;
+
+/* Get Errors - no_cdr */
+if($response[status]!='success'){
+    echo $response[status];
+    exit;
+}
+
+/* Get CDR Array */
+$cdr = $response[cdr];
+
+/* Calls */
+$calls = count($cdr);
+
+/* Duration / Total */
+foreach($cdr as $call){
+    $duration += $call[seconds];
+    $total += $call[total];
+}
+$duration = secToTime($duration);
+
+?>
+<table cellspacing="0" cellpadding="6" style="border: 1px solid #336699">
+    <tr style="border: 1px solid #336699">
+        <td style="border: 1px solid #336699">
+            Date
+        </td>
+        <td style="border: 1px solid #336699">
+            CallerID
+        </td>
+        <td style="border: 1px solid #336699">
+            Destination
+        </td>
+        <td style="border: 1px solid #336699">
+            Description
+        </td>
+        <td style="border: 1px solid #336699">
+            Duration
+        </td>
+        <td style="border: 1px solid #336699">
+            Cost
+        </td>
+    
+    </tr>
+    <?
+    foreach($cdr as $call){
+        ?>
+        <tr>
+            <td>
+                <? echo $call[date]; ?>
+            </td>
+            <td>
+                <? echo $call[callerid]; ?>
+            </td>
+            <td>
+                <? echo $call[destination]; ?>
+            </td>
+            <td>
+                <? echo $call[description]; ?>
+            </td>
+            <td align="right">
+                <? echo $call[duration]; ?>
+            </td>
+            <td align="right">
+                <? echo $call[total]; ?>
+            </td>
+        </tr>
+        <?
+    }
+    ?>
+    <tr>
+        <td colspan="7" align="right">
+            <? echo "Calls: {$calls} | Duration: {$duration} | Total: \${$total}"; ?>
+        </td>
+    </tr>
+</table>
+
+<?
+
+/* Function to Calculate Time */
+function secToTime($secs){
+    if(!$secs){return 0;}
+    
+    $vals = array('h' => floor($secs / 3600), 
+                  'm' => floor($secs % 3600 / 60), 
+                  's' => $secs % 60); 
+
+    $ret = array(); 
+
+    $added = false; 
+    foreach ($vals as $k => $v) { 
+        if ($v > 0 || $added) { 
+            $ret[] = ((strlen($v) == 1) && $added) ? "0$v" : $v; 
+            $added = true;
+        } 
+    } 
+
+    return join(':', $ret); 
+}
+```
 
 # Support
 
